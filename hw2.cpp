@@ -1,6 +1,6 @@
 //
 //	Bryant Clouse
-//	Multi-armed bandit
+//	Grid-World
 //
 
 #include <stdio.h>
@@ -16,6 +16,8 @@
 using namespace std;
 
 int main() {
-
+	int n = 5, m = 5;
+	GridWorld grid (n,m,1,2);
+	grid.display(0);
 	return 0;
 }
