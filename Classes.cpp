@@ -6,72 +6,171 @@
 
 GridWorld::GridWorld(int sx, int sy, int gx, int gy) {
 	sizeX = sx; sizeY = sy;
-	goal = (gy-1)*sx+(gx-1);
-	grid = get_array(sx,sy);
+	sgoal = (gy-1)*sx+(gx-1);
+	lgoal[0] = gx-1; lgoal[1] = gy-1;
+	agent[0] = 0; agent[1] = 0;
 }
 
 int GridWorld::give_reward(int state) {
 	int reward = 0;
-	if (state == goal) {
+	if (state == sgoal) {
 		reward = 100;
 	}
-	return reward - 1;
+	return reward-1;
 }
 
 int GridWorld::new_state(int state, int direction) {
-
+	int original = state;
+	switch(direction) {
+		case 0:								//UP 
+			if (state/sizeX != 0) {
+				state -= sizeX;
+			}
+			break;
+		case 1:								//RIGHT
+			if (state%sizeX != sizeX-1) {
+				state++;
+			}
+			break;
+		case 2: 								//DOWN
+			if (state/sizeX != sizeY-1) {
+				state += sizeX;
+			}
+			break;
+		case 3: 								//LEFT
+			if (state%sizeX != 0) {
+				state--;
+			}
+			break;
+	}
+	state2coord(agent,sizeX,state);
+	TestA(original,state,direction);
+	return state;
 }
 
-void GridWorld::display(int agent) {
+void GridWorld::display(int agent_state) {
 	int current_state;
 	for (int i = 0; i < sizeY; i++) {
 		for (int j = 0; j < sizeX; j++) {
 			current_state = i*sizeX+j;
-			if (current_state == goal) {
-				cout << "G ";
-			} else if (current_state == agent) {
+			if (current_state == sgoal) {
+				if (agent_state == sgoal) {
+					cout << "O ";
+				} else {
+					cout << "G ";
+				}
+			} else if (current_state == agent_state) {
 				cout << "A ";
 			} else {
-				cout << "_ ";
+				cout << ". ";
 			}
 		}
 		cout << endl;
 	}
 }
 
-//===============================
+void GridWorld::TestA(int old, int new_, int dir) {
+	if (dir == 1 || dir == 3) {
+		assert(old/sizeX == new_/sizeX);
+	} else {
+		assert(new_ >= 0 && new_ < sizeX*sizeY);
+	}
+	//cout << "assert succeeded\n";
+}
+
+bool GridWorld::found_goal(int input) {
+	if (input == sgoal) 
+		return true;
+	return false;
+}
+ //===============================
 //	Agent Class
 //===============================
+//*
+Agent::Agent(int n, double x,double y,double z,GridWorld *grid) {
+	e = x;
+	a = y;
+	g = z;
+	size = n;
+	state = 0;
+	world = grid;
+}
+
+void Agent::get_array(int n, int m) {
+	Q_Table = new float* [n]();
+	for (int i = 0; i < n; i++) {
+		Q_Table[i] = new float [m]();
+	}
+}
+
+void Agent::set_state(int n) {
+	state = n;
+}
+
+int Agent::get_state() {
+	return state;
+}
+
+void Agent::ruleOfThumb() {
+	int old;
+	int dir = 0;
+	bool left = true;
+	while (!world->found_goal(state)) {
+		old = state;
+		if (dir == 0) {
+			state = world->new_state(state,1);
+		} else if (dir == 1) {
+			state = world->new_state(state,2);
+			if (left) {
+				dir = 2; left = false;
+			} else {
+				dir = 0; left = true;
+			}
+		} else {
+			state = world->new_state(state,3);
+		}
+
+		if (old == state) dir = 1;
+
+		world->display(state);
+		cout << endl;
+	}
+	TestC();
+}
+
+void Agent::TestB() {
+	assert(world->found_goal(state));
+	cout << "Test B succeeded!\n";
+}
+
+void Agent::TestC() {
+	assert(world->found_goal(state));
+	cout << "Test C succeeded!\n";
+}
+
 /*
-Agent(int,double,double,double) {
+void Agent::decide() {
+	if (ZERO_TO_ONE <= e) {
+		return (rand()%4)+1;
+	} else {
+		return greedy();
+	}
+}
+
+void Agent::greedy() {
+
+}
+
+void Agent::action() {
 	
 }
 
-void set_pos(int,int) {
-	
-}
-
-void move(int x, int y) {
-	
-}
-
-void decide() {
-	
-}
-
-void action() {
-	
-}
-
-*/
+//*/
 //===============================
 //	Functions
 //===============================
 
-float **get_array(int n, int m) {
-	float **arr = new float* [n]();
-	for (int i = 0; i < n; i++) {
-		arr[i] = new float [m]();
-	}
-	return arr;
+void state2coord(int loc[2], int sizeX, int state) {
+	loc[0] = state%sizeX;
+	loc[1] = state/sizeX;
 }

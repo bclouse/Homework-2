@@ -9,6 +9,8 @@
 
 using namespace std;
 
+#define ZERO_TO_ONE (double)rand()/RAND_MAX
+
 #ifndef CLASSES_H
 #define CLASSES_H
 
@@ -19,36 +21,47 @@ using namespace std;
 class GridWorld {
 private:
 	int sizeX, sizeY;
-	int goal;
-	float **grid;
+	int sgoal;
+	int lgoal[2];
+	int agent[2];
 public:
 	GridWorld(int, int, int, int);
+	int new_state(int,int);
 	int give_reward(int);
-	int new_state(int, int);
 	void display(int);
+	bool found_goal(int);
+	void TestA(int,int,int);
 };
 
-/*==============================
+//*==============================
 //	Agent Class
 //===============================
 
 class Agent{
 private:
-	float Q_Table**;
-	int state;
+	float **Q_Table;
+	GridWorld *world;
 	double e, a, g;	//Epsilon, Alpha, and Gamma
+	int size;
 public:
-	Agent(int,double,double,double);
-	void set_pos(int,int);
-	void move(int, int);
-	void decide();
-	void action();
+	int state;
+	Agent(int,double,double,double,GridWorld*);
+	void set_state(int);
+	// void decide();
+	// void action();
+	int get_state();
+	void get_array(int,int);
+	void ruleOfThumb();
+	void TestB();
+	void TestC();
+	// int greedy();
+	// void update(int);
 };//*/
 
 //===============================
 //	Functions
 //===============================
 
-float** get_array(int,int);
+void state2coord(int*,int,int);
 
 #endif
