@@ -30,7 +30,8 @@ public:
 	int give_reward(int);
 	void display(int);
 	bool found_goal(int);
-	void TestA(int,int,int);
+	void TestA();
+	int get_state();
 };
 
 //*==============================

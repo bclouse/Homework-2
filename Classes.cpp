@@ -8,7 +8,7 @@ GridWorld::GridWorld(int sx, int sy, int gx, int gy) {
 	sizeX = sx; sizeY = sy;
 	sgoal = (gy-1)*sx+(gx-1);
 	lgoal[0] = gx-1; lgoal[1] = gy-1;
-	agent[0] = 0; agent[1] = 0;
+	agent[0] = -5; agent[1] = 5;
 }
 
 int GridWorld::give_reward(int state) {
@@ -44,7 +44,6 @@ int GridWorld::new_state(int state, int direction) {
 			break;
 	}
 	state2coord(agent,sizeX,state);
-	TestA(original,state,direction);
 	return state;
 }
 
@@ -69,13 +68,13 @@ void GridWorld::display(int agent_state) {
 	}
 }
 
-void GridWorld::TestA(int old, int new_, int dir) {
-	if (dir == 1 || dir == 3) {
-		assert(old/sizeX == new_/sizeX);
-	} else {
-		assert(new_ >= 0 && new_ < sizeX*sizeY);
-	}
-	//cout << "assert succeeded\n";
+void GridWorld::TestA() {
+	if (agent[0] < 0) 		agent[0] = 0;
+	if (agent[0] > sizeX) 	agent[0] = sizeX;
+	if (agent[1] < 0) 		agent[1] = 0;
+	if (agent[1] > sizeY) 	agent[1] = sizeY;
+	assert(agent[0] >= 0 && agent[0] <= sizeX);
+	assert(agent[1] >= 0 && agent[1] <= sizeY);
 }
 
 bool GridWorld::found_goal(int input) {
@@ -83,6 +82,14 @@ bool GridWorld::found_goal(int input) {
 		return true;
 	return false;
 }
+
+int GridWorld::get_state() {
+	int output = agent[1]*sizeX+agent[0];
+	cout << agent[0] << ',' << agent[1] << endl;
+	cout << output << endl;
+	return output;
+}
+
  //===============================
 //	Agent Class
 //===============================
